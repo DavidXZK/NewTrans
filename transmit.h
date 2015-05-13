@@ -34,7 +34,7 @@ class individul
 			is_immune = false;
 			in_rate = infectious_rate;   //全局变量
 		}
-		void getDisease(double);//判断感染类型
+		void getDisease(double,double,double,double,double,bool);//判断感染类型
 		void freeDisease();
 		void Dead();
 		void Reset(){
@@ -46,7 +46,7 @@ class individul
 			is_immune = false;
 		}		
 };
-void individual::getDisease(double time){
+void individual::getDisease(double time,subarea*apt){
 	double rand1 = (double)rand()/RAND_MAX;
 	double rand2 = (double)rand()/RAND_MAX;
 	double latency = (-mean_latency)*log(1-rand2);
@@ -56,7 +56,16 @@ void individual::getDisease(double time){
 		rand2 = (double)rand()/RAND_MAX;
 		double sym_time = (-mean_infect_sym)*log(1 - rand2);
 		disease_state = 1;
-		dis = new disease();
+		dis = new disease(time,latency,pre_time,sym_time,0,true);  //初始化disease
+		apt->infected.insert(pid);   //加入感染者群体
+	}
+	else
+	{
+		rand1 = (double)rand()/RAND_MAX;
+		double asym_time = (-mean_infect_asym)*log(1-rand1);
+		disease_state = 1;
+		dis = new disease(time,latency,0,0,asym_time,true);
+		apt->infected.insert(pid);
 	}
 	
 }
@@ -72,5 +81,6 @@ class subarea
 			vaccine_used = 0;
 		}
 		unordered_map<int,individual*> individuals;
+		vector<int> infected;
 		void Reset();
 }
