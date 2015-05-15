@@ -24,9 +24,35 @@ void individual::getDisease(double time,subarea*apt){
 	
 }
 
+double getBeta(individual*ninv){
 
-void calInfect(){
-	
+	map_iter iter = ninv->home.begin();
+	while(iter != ninv->home.end()){
+		
+	}
+}
+
+
+void calInfect(unordered_map<int,individual*>& network,subarea*apt,individual*inv,double period){
+	double ir = ((inv->age<=cutage)?Ager:1.0)*inv->infectious;
+	map_iter iter = network.begin();
+	while(iter != network.end()){
+		int id = iter->first;
+		individual* ninv = iter->second;
+		inv_iter inv_iter1 = (apt->individuals).find(id);
+		if(inv_iter1 != apt->individuals.end()){
+			ninv = inv_iter1->second;
+		}
+		else{
+			cout<<"in calInfect missid = "<<id<<endl;
+			exit(1);
+		}
+		/*we got all message about one neighbor.
+		 *then we traversal the infectious neighbor of this one
+		 * 
+		 * */
+		
+	}
 
 }
 
