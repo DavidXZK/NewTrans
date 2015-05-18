@@ -34,7 +34,7 @@ double getBeta(individual*ninv){
 
 
 void calInfect(unordered_map<int,individual*>& network,subarea*apt,individual*inv,double period){
-	double ir = ((inv->age<=cutage)?Ager:1.0)*inv->infectious;
+	double ir = ((inv->age<=cutage)?Ager:1.0)*inv->infectious;   
 	map_iter iter = network.begin();
 	while(iter != network.end()){
 		int id = iter->first;
@@ -70,4 +70,8 @@ void Transmit(subarea*apt,individual*inv,double time){
 	else{
 	
 	}
+}
+
+void transmit(subarea*apt,double time){
+	map_iter 
 }
