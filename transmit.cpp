@@ -71,7 +71,58 @@ void Transmit(subarea*apt,individual*inv,double time){
 	
 	}
 }
+double calBeta(unordered_map<int,individual*>& network,double time){
+	map_iter iter = network.begin();
+	while(iter != network.end()){
+		individual* inv = iter->second;
+		
+		if(inv->dis->disease_state == 1){
+			
+		}
+		iter ++;
+	}
+}
+double beta(individual* inv,double time){
+	double sum = 0;
 
+	return sum;
+}
 void transmit(subarea*apt,double time){
-	map_iter 
+	/*遍历某一区域中的所有个体，除去死亡以及康复的，
+	其他的分类处理*/
+	map_iter iter = apt->individuals.begin();
+	while(iter != apt->individuals.end()){
+		individual* inv = iter->second;
+		int disease_state = inv->disease_state;
+		if(disease_state==2||disease_state==3){   //recover or dead
+			continue;
+		}
+		if(disease_state==1){   //infected
+			double delta_time = time - inv->dis->time_infected;   //感染时间
+			double sum_sym_time = inv->dis->lantency + inv->dis->pre_time + inv->dis->sym_time;
+			double asym_time = inv->dis->lantency + inv->dis->asym_time;
+			if(inv->disease->is_sym){    //显性症状
+				if(delta_time >= sym_time){
+					double random = (double)rand()/RAND_MAX;
+					double dr = death_rate;
+					if(random<=dr){
+						inv->Dead(apt);
+					}
+					else{
+						inv->FreeDisease(apt);
+					}//if-else
+				}//if
+			}
+			else{
+				if(delta_time >= asym_time){
+					inv->FreeDisease(apt);
+				}//if
+			}
+		}// infected
+		if(disease_state==0){
+			double beta = beta(inv);
+			//blabla 计算,是否感染
+		}
+		iter ++;
+	}
 }

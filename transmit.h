@@ -22,7 +22,7 @@ class disease{
 }
 class individul{
 	public:
-		int pid,age,slaveid,disease_state;
+		int pid,age,slaveid,disease_state;  //disease_state = 0,1,2,3
 		double susceptibility,infectious,in_rate;//感染概率
 		bool is_treat,is_drug,is_immune;//治疗，服用抗病毒药物，注射疫苗
 		unordered_map<int,individual*>home,school,work,friends,community,commute;
