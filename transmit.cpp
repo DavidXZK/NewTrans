@@ -71,18 +71,21 @@ void Transmit(subarea*apt,individual*inv,double time){
 	
 	}
 }
-double calBeta(unordered_map<int,individual*>& network,double time){
+double calBeta(unordered_map<int,individual*>& network,double time){  //cal beta of one network
 	map_iter iter = network.begin();
+	double sum = 0;
 	while(iter != network.end()){
 		individual* inv = iter->second;
-		
 		if(inv->dis->disease_state == 1){
-			
+			double latency = ;
+			double time_pre = ;
+			double time_sym = ;
+			double time_asym = ;
 		}
 		iter ++;
 	}
 }
-double beta(individual* inv,double time){
+double beta(individual* inv,double time){    // tranverse every network 
 	double sum = 0;
 
 	return sum;
