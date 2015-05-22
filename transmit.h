@@ -6,6 +6,17 @@ using namespace std;
 using namespace std::tr1;
 
 typedef unordered_map<int,individual*>::iterator map_iter;
+int n,T,cutage;
+double LAMDA,infectious_rate,death_rate;
+double mean_latency,mean_infectious_pre,mean_infectious_sym,mean_infectious_asym;
+double Age_infectious_rate,Age_susceptible_rate;
+double Infectious_rate_pre,Infectious_rate_sym,Infectious_rate_asym;
+double school_intensity,home_intensity,work_intensity;
+double community_intensity,friends_intensity,commute_intensity;
+double treat_infectious,susceptible_prevention,infectious_prevention;
+double ill_rate_prevention,ill_rate_treat,infectious_treat;
+double get_treat_rate,get_immune_rate;
+double school_decrease,work_decrease;
 
 class disease{
 	public:
@@ -33,16 +44,26 @@ class individul{
 			is_immune = false;
 			in_rate = infectious_rate;   //全局变量
 		}
-		void getDisease(double,double,double,double,double,bool);//判断感染类型
-		void freeDisease();
-		void Dead();
-		void Reset(){
+		void getDisease(double time);//判断感染类型
+		void freeDisease(){
+			disease_state = 2;
+			delete dis;
+			dis = NULL;
+		}
+		void dead(){
+			disease_state = 3;
+			delete dis;
+			dis = NULL;
+		}
+		void reset(){
 			disease_state = 0;
 			susceptibility = 1.0;
 			infectious = 1.0
 			is_treat = false;
 			is_drug = false;
 			is_immune = false;
+			delete dis;
+			dis = NULL;
 		}		
 };
 
@@ -50,6 +71,7 @@ class subarea{
 	public:
 		int aid;
 		int drug_used,pdrug_used,vaccine_used;
+		int recover_num,dead_num;
 		subarea(int id):aid(id){
 			drug_used = 0;
 			pdrug_used = 0;
@@ -58,8 +80,9 @@ class subarea{
 		unordered_map<int,individual*> individuals;
 		unordered_map<int,individual*> extraNeighbor;
 		vector<int> infected;
-		void Reset();
+		void reset();
 };
 
-void transmit(subarea*,individual*inv,double time);
-void calInfect(subarea*,individual*,);
+void transmit(subarea*,double);
+pair<double,int> beta(individual*,double);
+double calBeta(unordered_map<int,individual*>& network,double intensity,double time);
