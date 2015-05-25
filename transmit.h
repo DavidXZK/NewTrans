@@ -77,8 +77,9 @@ class subarea{
 			pdrug_used = 0;
 			vaccine_used = 0;
 		}
-		unordered_map<int,individual*> individuals;
-		unordered_map<int,individual*> extraNeighbor;
+		unordered_map<int,individual*> individuals;  //区域人口
+		unordered_map<int,individual*> updateNeighbor;  //网络邻居
+		vector<individual*> uploadIndividuals;   //上传个体信息
 		vector<int> infected;
 		void reset();
 };
