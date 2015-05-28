@@ -38,7 +38,7 @@ void subarea::reset(){
 		iter1 ++;
 	}
 }
-void Parameter(ifstream& fin){
+void parameter(ifstream& fin){
     fin>>n>>T>>cutage;
     fin>>LAMDA>>infectious_rate>>death_rate;
     fin>>mean_latency>>mean_infectious_pre>>mean_infectious_sym>>mean_infectious_asym;

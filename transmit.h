@@ -84,6 +84,7 @@ class subarea{
 		void reset();
 };
 
+void getParameter(ifstream& fin);
 void transmit(subarea*,double);
 pair<double,int> beta(individual*,double);
 double calBeta(unordered_map<int,individual*>& network,double intensity,double time);
