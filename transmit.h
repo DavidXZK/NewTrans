@@ -6,6 +6,8 @@ using namespace std;
 using namespace std::tr1;
 
 typedef unordered_map<int,individual*>::iterator map_iter;
+const int MAX_SLAVE = 500000;
+const int MAX_NEIGHBOR = 100000;
 int n,T,cutage;
 double LAMDA,infectious_rate,death_rate;
 double mean_latency,mean_infectious_pre,mean_infectious_sym,mean_infectious_asym;
@@ -78,9 +80,10 @@ class subarea{
 			vaccine_used = 0;
 		}
 		unordered_map<int,individual*> individuals;  //区域人口
-		unordered_map<int,individual*> updateNeighbor;  //网络邻居
-		vector<individual*> uploadIndividuals;   //上传个体信息
+		unordered_map<int,individual*> neighbor_to_update;  //网络邻居
+		vector<pair<int,individual*> > individual_to_upload;   //上传个体信息
 		vector<int> infected;
+		vector<int> first_infected;
 		void reset();
 };
 

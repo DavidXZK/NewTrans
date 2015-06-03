@@ -37,6 +37,16 @@ void subarea::reset(){
 		}
 		iter1 ++;
 	}
+	iter1 = neighbor_to_update.begin();
+	iter2 = neighbor_to_update.end();
+	while(iter1 !=iter2){
+		if(iter1->second->disease_state != 0){
+			iter1->second->disease_state = 0;
+			delete iter1->second->dis;
+			iter1->second->dis = NULL;
+		}
+		iter1 ++;
+	}//while
 }
 void parameter(ifstream& fin){
     fin>>n>>T>>cutage;
@@ -52,7 +62,7 @@ void parameter(ifstream& fin){
 	fin>>school_decrease>>work_decrease;
 }
 
-double calBeta(unordered_map<int,individual*>& network,double intensity,double time){  //cal beta of one network
+double calbeta(unordered_map<int,individual*>& network,double intensity,double time){  //cal beta of one network
 	map_iter iter = network.begin();
 	double sum = 0;
 	while(iter != network.end()){
