@@ -21,12 +21,11 @@ int*slavebuf2;
 double*slavebuf3;
 subarea* myarea = NULL;
 unordered_map<int,int>pid_slaveid;     //personid-slaveid
-unordered_map<int,individual*> extraInv;   //personid-individual
-unordered_map<int,int> extra_pid_slaveid;  //slaveid-personid
+unordered_map<int,int> extra_pid_slaveid;  //pid-slaveid
 ofstream ffout("result_trans.txt",ofstrean::app);
 int slave_infect = 0;
 vector<int> infect_num;
-
+//***************************************************************
 template<typename T>
 void vector_to_array(T*array,vector<T>& vectors){
 	for(int i=0;i<vectors.size();i++){
@@ -41,9 +40,14 @@ void initial_Subarea(){
         	myarea->individuals[first_infected.at(i)]->getDisease(0);
         }
     }
+    else{
+    	 infect_num.clear();
+    	 infect_num.push_back(SEED_NUM);
+    }
+
 }
 
-void readNet(string filenames,int flag,subarea*apt)
+void readNet(string filenames,int flag,subarea*apt,unordered_set<int>& sset)
 {
     string filename = filenames;
 	ifstream fin(filename.c_str());
@@ -57,6 +61,10 @@ void readNet(string filenames,int flag,subarea*apt)
 			for(int i =0;i<degree;i++)
 			{
 				fin>>destid>>destage;
+				if(sset.find(destid)!=sset.end()){
+					individual*inv = new individual(destid,destage,0);
+					apt->neighbor_to_update.insert(make_pair(destid,inv));
+				}//if
                 switch(flag)
                 {
                     case 1:
@@ -91,9 +99,9 @@ void readNet(string filenames,int flag,subarea*apt)
 	fin.close();
 }//readNet
 
-void read_file_master(char* filename,char*filename_sp){
+void read_file_master(char* filename,char*filename_extra){
 	/* pid_slaveid:所有信息
-	   extra_pid_slaveid:外围邻居网络 
+	   extra_pid_slaveid:外围邻居网络,pid-extra i 
 	*/
 	ifstream fin(filename);
 	int slaveid,pid,age,num;
@@ -102,14 +110,15 @@ void read_file_master(char* filename,char*filename_sp){
 		pid_slaveid[pid] = slaveid;
 	}
 	fin.close();
-	ifstream fin_sp(filename_sp);
-	while(fin_sp>>slaveid>>pid>>age){
+
+	ifstream fin_sp(filename_extra);
+	while(fin_sp>>pid>>slaveid){
 		extra_pid_slaveid[pid] = slaveid;
 	}
 	fin_sp.close();
 }
 
-void read_file_slave(char*filename,char*filename_ep){
+void read_file_slave(char*filename,char*filename_np,char*filename_up){
 	ifstream fin(filename);
 	int slaveid,pid,age;
 	while(fin>>slaveid>>pid>>age)
@@ -120,22 +129,30 @@ void read_file_slave(char*filename,char*filename_ep){
 		}
 	}
 	fin.close();
-	ifstream fin_ep(filename_ep);
+	ifstream fin_np(filename_np);
 	int slaveid,pid,age;
-	while(fin_ep>>slaveid>>pid>>age)
+	while(fin_np>>slaveid>>pid)
 	{
 		if(slaveid == myid)
 		{
-			myarea->updateNeighbor[pid] = new individual(pid,age,0);
+			myarea->individual_to_upload.push_back(make_pair(0,myarea->individuals.find(pid)->second));
 		}
 	}
-	fin_ep.close();
-	readNet(".//JTNet.txt",1,myarea);
-    readNet(".//XXNet.txt",2,myarea);
-    readNet(".//GZNet.txt",3,myarea);
-    readNet(".//PYNet.txt",4,myarea);
-    readNet(".//SQNet.txt",5,myarea);
-    readNet(".//TQNet.txt",6,myarea);
+	fin_np.close();
+	unordered_set<int> ids;
+	ifstream fin_up(filename_up);
+	while(fin_up>>slaveid>>pid){
+		if(slaveid == myid){
+			ids.insert(pid);
+		}
+	}
+	fin_up.close();
+	readNet(".//JTNet.txt",1,myarea,ids);
+    readNet(".//XXNet.txt",2,myarea,ids);
+    readNet(".//GZNet.txt",3,myarea,ids);
+    readNet(".//PYNet.txt",4,myarea,ids);
+    readNet(".//SQNet.txt",5,myarea,ids);
+    readNet(".//TQNet.txt",6,myarea,ids);
 }
 
 void malloc_memory_master(){
@@ -180,7 +197,7 @@ void memory_release(){
 }//memory_release()
 
 void generateInfect(vector<vector<int> >& id){
-	for(int i=0;i<numprocs;i++){
+	for(int i = 0;i < numprocs;i ++){
 		vector<int> which;
 		id.push_back(which);
 	}
@@ -199,7 +216,7 @@ void generateInfect(vector<vector<int> >& id){
 			}
 		}//while
 		unordered_map<int,int>::iterator it = pid_slaveid.find(index);
-		if(it==pid_slaveid.end()){
+		if(it == pid_slaveid.end()){
 			cout<<"can't find error"<<endl;
 			exit(0);
 		}
@@ -297,20 +314,24 @@ void recv_from_master(double time){
     
 }// recv_from_master
 
-void send_data_to_master(){//infect num
-	MPI_Send(&slave_infect,1,MPI_INT,i,90,MPI_COMM_WORLD);
+void send_data_to_master(int infect){
+	/*more data to send*/
+	int slave = infect;
+	MPI_Send(&slave,1,MPI_INT,0,89,MPI_COMM_WORLD);
 }
 
-void recv_data_from_slave(){
-	int*si = new int[numprocs];
+void recv_data_from_slave(int* si){
+	/*add more data recved*/
 	MPI_Status status;
 	for(int i=1;i<numprocs;i++){
-		MPI_Recv(&si[i],1,MPI_INT,i,90,MPI_COMM_WORLD,&status);
+		MPI_Recv(&si[i],1,MPI_INT,i,89,MPI_COMM_WORLD,&status);
 	}
-	int sum = 0;
-	for(int i = 1;i < numprocs;i ++){
-		sum += si[i];
+}
+
+void write_result_to_file(){
+	ofstream fout("");
+	for(int i=0;i<T;i++){
+		fout<<infect_num[i]<<endl;
 	}
-	infect_num.push_back(sum);
-		
+	fout.close();
 }

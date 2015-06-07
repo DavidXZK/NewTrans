@@ -18,7 +18,7 @@ int main(int argc,char**argv){
 	}
 	MPI_Barrier(MPI_COMM_WORLD);
 
-	if(myid==0){
+	if(myid == 0){
 		vector<vector<int> > id;
 		generateInfect(id);
 		seedsize = new int[numprocs];
@@ -44,7 +44,7 @@ int main(int argc,char**argv){
 		int*slavebuf = new int[rec_size];// receive rand seed
 		MPI_Recv(slavebuf,rec_size,MPI_INT,0,99,MPI_COMM_WORLD,&status_b);
 		for(int i=0;i<rec_size;i++){
-			myarea->first_infected.insert(slavebuf[i]);
+			myarea->first_infected.push_back(slavebuf[i]);
 		}
 		delete []slavebuf;
 	}//else
@@ -59,8 +59,8 @@ int main(int argc,char**argv){
 				vector<int> ids;
 				for(int j = 0;j < individual_to_upload.size();j ++){
 					pair<int,individual*> &temp = individual_to_upload[j];
-					if(temp->first == 0 && (temp.second)->disease_state == 1){
-						temp->first = 1;
+					if(temp.first == 0 && (temp.second)->disease_state == 1){
+						temp.first = 1;
 						ids.push_back((temp.second)->pid);
 						sym_or_not.push_back(((temp.second)->dis->is_sym)?1:0);
 						distime.push_back((temp.second)->dis->lantency);
@@ -82,24 +82,27 @@ int main(int argc,char**argv){
 			}
 
 			if(myid != 0){// 传播过程
+				transmit(t,myarea);
 				unordered_map<int,individual*>::iterator iter = myarea->individuals.begin();
-				while(iter != myarea->individuals.end()){
-					transmit(t);
-					iter ++;
-				}//while
-				iter = myarea->individuals.begin();
 				while(iter != myarea->individuals.end()){ //统计感染人数
 					if(iter->second->disease_state == 1){
 						slave_infect += 1;
 					}
 					iter ++;
 				}//while
-			}//if
-			//transfer infect num to master 
-
+				send_data_to_master(slave_infect);
+			}//if transfer infect num to master 
+			else{
+				int si[numprocs];
+				recv_data_from_slave(si);
+				int sum = 0;
+				for(int j=1;j<numprocs;j++){
+					sum += si[j];
+				}
+				infect_num.push_back(sum);
+			}
 		}//for t
+		write_result_to_file();
 	}//for i
-
-
 }
 //new reset 

@@ -8,7 +8,7 @@ using namespace std::tr1;
 typedef unordered_map<int,individual*>::iterator map_iter;
 const int MAX_SLAVE = 500000;
 const int MAX_NEIGHBOR = 100000;
-int n,T,cutage;
+int n,T,cutage,SEED_NUM;
 double LAMDA,infectious_rate,death_rate;
 double mean_latency,mean_infectious_pre,mean_infectious_sym,mean_infectious_asym;
 double Age_infectious_rate,Age_susceptible_rate;
@@ -38,7 +38,7 @@ class individul{
 		int pid,age,slaveid,disease_state;  //disease_state = 0,1,2,3
 		double susceptibility,infectious,in_rate;//感染概率
 		bool is_treat,is_drug,is_immune;//治疗，服用抗病毒药物，注射疫苗
-		unordered_map<int,individual*>home,school,work,friends,community,commute;
+		unordered_map<int,int>home,school,work,friends,community,commute;
 		disease* dis;
 		Individual(int pids,int ages,int slaveids):pid(pids),age(ages),slaveid(slaveids){
 			is_treat = false;
@@ -82,7 +82,6 @@ class subarea{
 		unordered_map<int,individual*> individuals;  //区域人口
 		unordered_map<int,individual*> neighbor_to_update;  //网络邻居
 		vector<pair<int,individual*> > individual_to_upload;   //上传个体信息
-		vector<int> infected;
 		vector<int> first_infected;
 		void reset();
 };
