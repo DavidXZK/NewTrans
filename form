@@ -1,0 +1,11 @@
+slave_pop.txt
+
+slaveid pid age
+
+NET.txt
+
+pid degree pid age
+
+neighbor_map.txt
+
+upload_map.txt
